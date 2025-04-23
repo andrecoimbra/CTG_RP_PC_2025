@@ -135,8 +135,8 @@ def create_pc(
     pc = plot_poincare_multiscale2(segment, lag, cmap=cmap)
 
     imageio.imwrite(
-        os.path.join(images_dir, fname), pc, format=suffix)#, **{"compression": compress}
-    #)
+        os.path.join(images_dir, fname), pc, format=suffix, **{"compression": compress}
+    )
 
     if show_image:
         plt.figure(figsize=(5, 5))
