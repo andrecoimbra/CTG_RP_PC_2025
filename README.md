@@ -1,4 +1,4 @@
-# CTG_RP_PC
+# CTG_RP_PC_2025
 ML/DL analysis of Cardiotocography (CTG) traces using Recurrence Plot and Poincaré Plot.
 
 This repo was forked from [Williams Doug's CTG_RP](https://github.com/williamsdoug/CTG_RP) repo.
@@ -9,40 +9,29 @@ The original repo contained Jupyter Notebooks and code to reproduce the results 
 The Notebooks and the code were adapted to check the results with Recurrence Plot and Poincaré Plot. The images were saved in the TIFF format, using the DEFLATE compression scheme, considering the paper [Compression of Different Time Series Representations in Asphyxia Detection](https://ieeexplore.ieee.org/iel7/9991246/9991267/09991468.pdf)
  by Bárbara Silva, Maria Ribeiro and Teresa S. Henriques.
 
-This repo was made for the final project requirements of the course Special Topics in Computer Systems, Graduate Program in Computer Science, UFG, 2023/2.
-
 ## Implementation Details
 
-Key Jupyter Notebooks (_currently configured to run on Google Colab_):
-- [CTG_RP_ResNet](https://github.com/andre-coimbra-ifg/CTG_RP_PC/blob/master/CTG_RP_ResNet.ipynb)
+Key Jupyter Notebook (_currently configured to run on Google Colab_):
+- [CTG_Train_Models](https://github.com/andrecoimbra/CTG_RP_PC_2025/blob/main/CTG_Train_Models.ipynb)
   - Initializes fresh colab instance, downloading source files, packages and dataset
   - Generates RP images
-    -  RP Images based on latest valid 10min CTG segment
-  -  CTG recordings partitioned into Train and Valid
-  -  Trains FastAI Model
-     -  Uses transfer learning to train using ResNetX [18, 34, 50] model
- 
-  
-
-- [CTG_PC_ResNet](https://github.com/andre-coimbra-ifg/CTG_RP_PC/blob/master/CTG_PC_ResNet.ipynb)
-  - Initializes fresh colab instance, downloading source files, packages and dataset
+     - CTG recordings partitioned into Train and Valid
+     - Trains and Test Models
   - Generates PC images
-    -  PC Images based on latest valid 10min CTG segment
-  -  CTG recordings partitioned into Train and Valid
-  -  Trains FastAI Model
-     -   Uses transfer learning to train using ResNetX [18, 34, 50] model
- 
+     - CTG recordings partitioned into Train and Valid
+     - Trains and Test Models
+    
 Other Notebooks:
-- [CTG_Display_Denoised](https://github.com/andre-coimbra-ifg/CTG_RP_PC/blob/master/CTG_Display_Denoised.ipynb)
+- [CTG_Display_Denoised](https://github.com/andrecoimbra/CTG_RP_PC_2025/blob/main/CTG_Display_Denoised.ipynb)
   - Displays sample denoised signals
   
-- [CTG_Generate_Recurrence_Plots](https://github.com/andre-coimbra-ifg/CTG_RP_PC/blob/master/CTG_Generate_Recurrence_Plots.ipynb)
+- [CTG_Generate_Recurrence_Plots](https://github.com/andrecoimbra/CTG_RP_PC_2025/blob/main/CTG_Generate_Recurrence_Plots.ipynb)
   - Creates individual RP Images.  _IMAGES_DIR/rp_images_index.json_ contains metadata associated with images for each recording
  
-- [CTG_Generate_Poincaré_Plots](https://github.com/andre-coimbra-ifg/CTG_RP_PC/blob/master/CTG_Generate_Poincar%C3%A9_Plots.ipynb)
+- [CTG_Generate_Poincaré_Plots](https://github.com/andrecoimbra/CTG_RP_PC_2025/blob/main/CTG_Generate_Poincare_Plots.ipynb)
   - Creates individual PC Images.  _IMAGES_DIR/pc_images_index.json_ contains metadata associated with images for each recording
   
-- [CTG_Explore_Datasets](https://github.com/andre-coimbra-ifg/CTG_RP_PC/blob/master/CTG_Explore_Datasets.ipynb)
+- [CTG_Explore_Datasets](https://github.com/andrecoimbra/CTG_RP_PC_2025/blob/main/CTG_Explore_Datasets.ipynb)
   - Builds Databunch and displays contents
 
 
@@ -58,10 +47,12 @@ Other Notebooks:
   - [pyts](https://pyts.readthedocs.io/en/latest/)
     - Used for generation of Recurrence Plots
     - `pip install pyts`
+      
   - [FastAI](https://docs.fast.ai/) library running on [PyTorch](https://pytorch.org/)
     - Used for deep learning
     - Installed by default on Google Colab
     - Version: 2.7.13
+      
   - [wfdb](https://wfdb.readthedocs.io/en/latest/index.html)
     - Waveform Database Utilities.  Used to read Physionet Recording Files
     - `pip install wfdb`
