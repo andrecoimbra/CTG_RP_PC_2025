@@ -2,23 +2,47 @@
 # Colab Notebook Configuration
 #
 
+GITHUB_PREFIX = (
+    "https://raw.githubusercontent.com/andrecoimbra/CTG_RP_PC_2025/main/src/"
+)
 
-GITHUB_PREFIX = 'https://raw.githubusercontent.com/williamsdoug/CTG_RP/master/src/'
 GITHUB_DEFAULT_SRC_FILES = [
-    'basic_denoise.py',
-    'compute_metadata.py',
-    'ctg_utils.py',
-    'libRP.py',
-    'generate_recurrence_images.py',
-    'test.py',  # used for test purposes only, TODO:  Delete after development complete
-    ]
+    "basic_denoise.py",
+    "compute_metadata.py",
+    "ctg_utils.py",
+    "generate_recurrence_images.py",
+    "generate_poincare_images.py",
+    "libPC.py",
+    "libRP.py",
+    "test.py",
+]
 
-RECORDINGS_DIR = '/content/ctu-uhb-ctgdb'
-IMAGES_DIR = '/content/images'
+GITHUB_BASIC_SRC_FILES = [
+    "basic_denoise.py",
+    "compute_metadata.py",
+    "ctg_utils.py",
+    "test.py",
+]
+
+GITHUB_RP_SRC_FILES = [
+    "generate_recurrence_images.py",
+    "libRP.py",
+] + GITHUB_BASIC_SRC_FILES
+
+GITHUB_PC_SRC_FILES = [
+    "generate_poincare_images.py",
+    "libPC.py",
+] + GITHUB_BASIC_SRC_FILES
+
+
+RECORDINGS_DIR = "/content/ctu-uhb-ctgdb"
+IMAGES_DIR = "/content/images"
+THRESHOLD_PH = 7.15
 
 
 def try_remove_python_file(fname):
     from pathlib import Path
+
     try:
         import_file = Path() / fname
         import_file.unlink()
@@ -28,6 +52,7 @@ def try_remove_python_file(fname):
 
 def try_remove_python_file_old(fname):
     import os
+
     try:
         os.remove(fname)
     except:
@@ -39,18 +64,34 @@ def get_github_files(flist):
 
     for fname in flist:
         try:
-            if '*' not in fname and '/' not in fname and '?' not in fname:
-                print('Beginning file download of file', fname)
-                print(GITHUB_PREFIX+fname)
+            if "*" not in fname and "/" not in fname and "?" not in fname:
+                print("Beginning file download of file", fname)
+                print(GITHUB_PREFIX + fname)
 
                 try_remove_python_file(fname)
-                urllib.request.urlretrieve(GITHUB_PREFIX+fname, fname)
+                urllib.request.urlretrieve(GITHUB_PREFIX + fname, fname)
             else:
-                print('Skipping file download of file', fname)
+                print("Skipping file download of file", fname)
         except:
-            print('Download failed for file', fname)
-    print('Done')
+            print("Download failed for file", fname)
+    print("Done")
 
 
 def get_default_github_src_files():
     get_github_files(GITHUB_DEFAULT_SRC_FILES)
+
+
+def get_rp_github_src_files():
+    get_github_files(GITHUB_RP_SRC_FILES)
+
+
+def get_pc_github_src_files():
+    get_github_files(GITHUB_PC_SRC_FILES)
+
+
+def get_gaf_github_src_files():
+    get_github_files(GITHUB_GAF_SRC_FILES)
+
+
+def get_mtf_github_src_files():
+    get_github_files(GITHUB_MTF_SRC_FILES)

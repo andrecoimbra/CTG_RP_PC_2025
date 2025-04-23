@@ -17,20 +17,19 @@ from basic_denoise import (
     get_segment_concatenation,
     get_segment_removing_zeros,
 )
-from libRP import create_rp
+from libPC import create_pc
 
 POLICIES = ["best_quality", "early_valid", "late_valid"]
-verbose_article = False
 
-def generate_rp_images_segment(
+def generate_pc_images_segment(
     recordings_dir,
     n_dec=4,
     clip_stage_II=False,
     max_seg_min=10,
     policy="early_valid",
-    rp_params=[{}],
+    pc_lags=[1],
     images_dir="",
-    images_index_file="rp_images_index.json",
+    images_index_file="pc_images_index.json",
     show_signal=False,
     show_image=False,
     verbose=False,
@@ -48,6 +47,10 @@ def generate_rp_images_segment(
         if limit == 0:
             break
         limit -= 1
+
+        # if recno != '1005':
+        #     # print(recno)
+        #     continue
 
         recno_full = os.path.join(recordings_dir, recno)
         all_sig, meta = wfdb.io.rdsamp(recno_full)
@@ -82,41 +85,6 @@ def generate_rp_images_segment(
             seg_hr = segment["seg_hr"]
             seg_tm = segment["seg_ts"] / 60
             orig_seg_hr = segment["orig_seg_hr"]
-            mask = segment["mask"]
-
-            # seg_ts = segment['seg_ts']
-            # # seg_tm_mod = np.arange(seg_start, len(seg_hr)+seg_start)/4.0/60
-            # seg_tm_mod = np.arange(seg_start, len(seg_hr)+seg_start)/4.0/60
-            # sig_ts_dif = np.abs(np.diff(seg_ts))
-            # diff_mask = sig_ts_dif > 0.25
-            # diff_mask = np.append(diff_mask, False)
-            # diff_mask = np.logical_or(diff_mask, np.roll(diff_mask, 1))
-            # seg_ts_final = np.copy(seg_ts)
-            # seg_ts_final[~diff_mask] = 0
-            # seg_hr_exclude = np.copy(seg_hr)
-            # seg_hr_exclude[~diff_mask] = 0
-            # diff_mask = seg_ts_final != 0
-            # seg_ts_final = seg_ts_final[diff_mask]/60
-            # seg_hr_exclude = seg_hr_exclude[diff_mask]
-
-            # plt.figure(figsize=(12, 2))
-            # plt.title('{}: Final Signal  {}-{}'.format(recno, seg_start, seg_end))
-            # plt.plot(seg_tm, seg_hr)
-            # plt.plot(seg_tm, orig_seg_hr, alpha=0.25)
-            # # plt.plot(seg_ts_final.reshape(-1, 2)[0],
-            # #          seg_hr_exclude.reshape(-1, 2)[0], 'r', linewidth=2)
-            # # plt.plot(seg_ts_final.reshape(-1, 2)[1],
-            # #          seg_hr_exclude.reshape(-1, 2)[1], 'r', linewidth=2)
-            # plt.xlim(seg_tm[0], seg_tm[-1])
-            # plt.ylim(50, 200)
-            # plt.show()
-
-            # plt.figure(figsize=(12, 2))
-            # plt.title('{}: Invalid'.format(recno))
-            # plt.plot(seg_tm, ~mask)
-            # plt.xlim(seg_tm[0], seg_tm[-1])
-            # plt.ylim(-0.1, 1.1)
-            # plt.show()
 
             seg_tm = np.arange(len(seg_hr)) / 4.0 / 60
 
@@ -141,50 +109,38 @@ def generate_rp_images_segment(
         # Reduce signal sampling rate (compact)
         if n_dec > 1:
             selected_hr = scipy.signal.decimate(selected_hr, n_dec)
+            # selected_hr = selected_hr[::n_dec]
+            # selected_hr = scipy.signal.resample(selected_hr, len(selected_hr) // n_dec)
+
+        selected_hr = np.round(selected_hr).astype(int)
+
+        if (len(selected_hr) * n_dec / 4 / 60) < max_seg_min:
+            print(
+                f"Segment {recno} only last {(len(selected_hr) * n_dec / 4 / 60):.2f} min, therefore less than desired duration ({max_seg_min})."
+            )
 
         image_names = []
-        for p in rp_params:
-            fname = create_rp(
+        for lag in pc_lags:
+            fname = create_pc(
                 selected_hr,
                 base_name=recno,
                 show_image=show_image,
                 images_dir=images_dir,
                 cmap=cmap,
-                **p
+                use_clip=clip_stage_II,
+                lag=lag,
             )
             image_names.append(fname)
 
         results[recno] = {"names": image_names, "outcome": meta["Outcome"]}
 
-    #     if verbose:
-    #         pprint(results)
+    if verbose:
+        pprint(results)
 
     with open(os.path.join(images_dir, images_index_file), "w") as outfile:
         json.dump(results, outfile)
 
     num_records = len(results)
-    num_images = num_records * len(rp_params)
+    num_images = num_records * len(pc_lags)
 
     return num_records, num_images
-
-
-# Configure Recurrent Plot Parameters
-def gen_recurrence_params(
-    dimensions=[2], time_delays=[1], percentages=[1, 3, 10], use_clip_vals=[False]
-):
-    rp_params = []
-
-    for dimension in dimensions:
-        for time_delay in time_delays:
-            for percentage in percentages:
-                for use_clip in use_clip_vals:
-                    rp_params.append(
-                        {
-                            "dimension": dimension,
-                            "time_delay": time_delay,
-                            "percentage": percentage,
-                            "use_clip": use_clip,
-                        }
-                    )
-
-    return rp_params
